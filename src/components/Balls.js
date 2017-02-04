@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { timer } from 'd3-timer';
 import { interpolateString } from 'd3-interpolate';
+
+//Redux
+import { connect } from 'react-redux';
+import { newPosition } from '../actions';
 
 const styling = 'width: 60px; height: 60px; background: radial-gradient(circle at 50% 120%, #81e8f6, #76deef 10%, #055194 80%, #062745 100%); border-radius: 50%; position: absolute;';
 
 class Balls extends React.Component {
+  static propTypes = {
+    AppState: PropTypes.array.isRequired,
+    dispatch: PropTypes.func.isRequired
+  }	
   constructor (props) {
     super(props);
     this._onDragOver = this._onDragOver.bind(this);
@@ -17,14 +25,13 @@ class Balls extends React.Component {
     this.state = {data:[{div:'div0',x: 0,y: 0},
 	{div:'div1',x:300,y:150},{div:'div2',x:150,y:400},
 	{div:'div3',x:360,y:450}], 
-	divs:{}, flag_tooltip: false};
+	flag_tooltip: false};
   }
   componentDidMount () {
-	this.state.divs = {div0, div1, div2, div3};
-	this.roll_it(150, 50, "div0", 0);
-    this.state.divs.div1.setAttribute('style', styling + ' top: ' + this.state.data[1].y + 'px; left: ' + this.state.data[1].x + 'px;');
-	this.state.divs.div2.setAttribute('style', styling + ' top: ' + this.state.data[2].y + 'px; left: ' + this.state.data[2].x + 'px;');
-	this.state.divs.div3.setAttribute('style', styling + ' top: ' + this.state.data[3].y + 'px; left: ' + this.state.data[3].x + 'px;');
+    this.state.data.map((div, index) => {
+      let this_div = div.div;
+      this.refs[this_div].setAttribute('style', styling + ' top: ' + this.state.data[index].y + 'px; left: ' + this.state.data[index].x + 'px;');
+	});
   }
   _onMouseEnter () {
     this.setState({flag_tooltip: true});
@@ -45,7 +52,9 @@ class Balls extends React.Component {
 		let divt = this.dragged;
 		item[index]= {div:div.div,x:event.clientX-25,y:event.clientY-25};
 		this.setState({data:item});
-		this.state.divs[divt].setAttribute('style', '');
+		this.props.dispatch(newPosition(item));
+        //console.log(this.props.AppState);
+		this.refs[divt].setAttribute('style', '');
 		
 		//Check for balls which have been hit
 		this.who_got_hit(index);
@@ -113,9 +122,9 @@ class Balls extends React.Component {
 		let current_position_x = interp0(t);
 		let current_position_y = interp1(t);
 		if (current_position_x == '600px' || current_position_y == '600px') {
-			this.state.divs[order].setAttribute('style', '');
+			this.refs[order].setAttribute('style', '');
 		} else {
-			this.state.divs[order].setAttribute('style', styling + ' left: ' + interp0(t) + '; top: '+ interp1(t) + ';');
+			this.refs[order].setAttribute('style', styling + ' left: ' + interp0(t) + '; top: '+ interp1(t) + ';');
 		}  
 		if (t === 1) {
 			this.transition.stop();
@@ -131,11 +140,12 @@ class Balls extends React.Component {
 		let divt = this.dragged;
 		item[index]= {div: div.div, x: event.clientX -25, y: event.clientY -25};
         this.setState({data:item});
-		this.state.divs[divt].setAttribute('style', styling + ' top: '+ this.state.data[index].y  + 'px; left: ' + this.state.data[index].x + 'px;');
+		this.refs[divt].setAttribute('style', styling + ' top: '+ this.state.data[index].y  + 'px; left: ' + this.state.data[index].x + 'px;');
       }
 	});
   } 
   render() {
+
 	let Tooltip;
 	if (!this.state.flag_tooltip) {
 		Tooltip = (<div> Grab a ball and drag it to hit and push the other balls outside the box! </div>);
@@ -163,4 +173,12 @@ class Balls extends React.Component {
     );
   }
 }			
-export default Balls;
+
+const mapStateToProps = state => {
+  const { AppState } = state;
+  return {
+    AppState
+  };
+};
+
+export default connect(mapStateToProps)(Balls);
