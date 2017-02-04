@@ -22,15 +22,12 @@ class Balls extends React.Component {
 	this._onMouseLeave = this._onMouseLeave.bind(this);
 	this.where_to_go = this.where_to_go.bind(this);
 	this.roll_it = this.roll_it.bind(this);
-    this.state = {data:[{div:'div0',x: 0,y: 0},
-	{div:'div1',x:300,y:150},{div:'div2',x:150,y:400},
-	{div:'div3',x:360,y:450}], 
-	flag_tooltip: false};
+    this.state = {flag_tooltip: false};
   }
   componentDidMount () {
-    this.state.data.map((div, index) => {
+	this.props.AppState.map((div, index) => {
       let this_div = div.div;
-      this.refs[this_div].setAttribute('style', styling + ' top: ' + this.state.data[index].y + 'px; left: ' + this.state.data[index].x + 'px;');
+      this.refs[this_div].setAttribute('style', styling + ' top: ' + this.props.AppState[index].y + 'px; left: ' + this.props.AppState[index].x + 'px;');
 	});
   }
   _onMouseEnter () {
@@ -46,12 +43,12 @@ class Balls extends React.Component {
     event.preventDefault();
 	
 	//Identify which one is being dragged
-	this.state.data.map((div,index)=> {
+	this.props.AppState.map((div,index)=> {
       if (this.dragged==div.div) {
-        let item = this.state.data;
+        let item = this.props.AppState;
 		let divt = this.dragged;
 		item[index]= {div:div.div,x:event.clientX-25,y:event.clientY-25};
-		this.setState({data:item});
+		//this.setState({data:item});
 		this.props.dispatch(newPosition(item));
         //console.log(this.props.AppState);
 		this.refs[divt].setAttribute('style', '');
@@ -64,12 +61,12 @@ class Balls extends React.Component {
   
   who_got_hit(index) {
 	let i;
-	for (i = 0; i < this.state.data.length; i++) {
+	for (i = 0; i < this.props.AppState.length; i++) {
       if (i !== index) {
-		let hitter_x = this.state.data[index].x;
-		let fixed_x = this.state.data[i].x;
-		let hitter_y = this.state.data[index].y;
-		let fixed_y = this.state.data[i].y;
+		let hitter_x = this.props.AppState[index].x;
+		let fixed_x = this.props.AppState[i].x;
+		let hitter_y = this.props.AppState[index].y;
+		let fixed_y = this.props.AppState[i].y;
 		
 		//Is the dragged-ball hitting a fixed-ball?
 		if ((fixed_x + 80 > hitter_x && hitter_x > fixed_x -50) && 
@@ -85,19 +82,19 @@ class Balls extends React.Component {
   
   where_to_go(hitter_x, fixed_x, hitter_y, fixed_y, order, i) { 
 	if ((hitter_x-fixed_x < 0)&&(hitter_y-fixed_y < 0)) {
-		let addx = this.state.data[i].x + 200, addy = this.state.data[i].y + 200;	
+		let addx = this.props.AppState[i].x + 200, addy = this.props.AppState[i].y + 200;	
 		this.roll_it(addx, addy, order, i);	
 		
 	} else if ((hitter_x-fixed_x < 0)&&(hitter_y-fixed_y > 0)) {
-		let addx = this.state.data[i].x + 200, addy = this.state.data[i].y - 200;
+		let addx = this.props.AppState[i].x + 200, addy = this.props.AppState[i].y - 200;
 		this.roll_it(addx, addy, order, i);
 	
 	} else if ((hitter_x-fixed_x > 0)&&(hitter_y-fixed_y > 0)) {
-		let addx = this.state.data[i].x - 200, addy = this.state.data[i].y - 200;
+		let addx = this.props.AppState[i].x - 200, addy = this.props.AppState[i].y - 200;
 		this.roll_it(addx, addy, order, i);
 	
 	} else if ((hitter_x-fixed_x > 0)&&(hitter_y-fixed_y < 0)) {
-		let addx = this.state.data[i].x - 200, addy = this.state.data[i].y + 200;
+		let addx = this.props.AppState[i].x - 200, addy = this.props.AppState[i].y + 200;
 		this.roll_it(addx, addy, order, i);
 	
 	} else {alert('that is a new move. I dont have the code for that yet. Sorry!');}
@@ -106,10 +103,11 @@ class Balls extends React.Component {
   roll_it(addx, addy, order, i) {
 	
 	//initial and end values
-	let x1 = this.state.data[i].x +'px', y1 = this.state.data[i].y + 'px';
-	let item = this.state.data;
+	let x1 = this.props.AppState[i].x +'px', y1 = this.props.AppState[i].y + 'px';
+	let item = this.props.AppState;
 	item[i] = {div: "div"+i, x: addx, y: addy};
-	this.setState({data:item});
+	this.props.dispatch(newPosition(item));
+	//this.setState({data:item});
 	let BoxLimit_x = 600; addx > BoxLimit_x ? addx = BoxLimit_x : addx;
 	let BoxLimit_y = 600; addy > BoxLimit_y ? addy = BoxLimit_y : addy;
 	let x2 = addx + 'px', y2 = addy + 'px';
@@ -134,13 +132,13 @@ class Balls extends React.Component {
   
   _onDrop (event) {
     event.preventDefault();	
-	this.state.data.map((div,index)=> {
+	this.props.AppState.map((div,index)=> {
       if (this.dragged==div.div) {
-        let item = this.state.data;
+        let item = this.props.AppState;
 		let divt = this.dragged;
 		item[index]= {div: div.div, x: event.clientX -25, y: event.clientY -25};
-        this.setState({data:item});
-		this.refs[divt].setAttribute('style', styling + ' top: '+ this.state.data[index].y  + 'px; left: ' + this.state.data[index].x + 'px;');
+        this.props.dispatch(newPosition(item));
+		this.refs[divt].setAttribute('style', styling + ' top: '+ this.props.AppState[index].y  + 'px; left: ' + this.props.AppState[index].x + 'px;');
       }
 	});
   } 
@@ -156,7 +154,7 @@ class Balls extends React.Component {
       <div width="600px" height="600px">
         <div id="div-1" style={{position: 'relative', width:'600px', height:'600px', margin: '10px', padding: '10px', border: '1px solid black'}} onDrop={this._onDrop} onDragOver={this._onDragOver}>
         {Tooltip}
-        {this.state.data.map((div,key) => {
+        {this.props.AppState.map((div,key) => {
           return (<div id={div.div} 
 			key={key} 
 			ref={div.div}   

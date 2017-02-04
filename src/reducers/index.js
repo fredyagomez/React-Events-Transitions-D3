@@ -5,7 +5,7 @@ import {
   NEW_POSITION
 } from '../actions';
 
-const AppState = (state = [{div:'div0',x: 0,y: 0},
+const AppState = (state = [{div:'div0',x: 150,y: 50},
 	{div:'div1',x:300,y:150},{div:'div2',x:150,y:400},
 	{div:'div3',x:360,y:450}], action) => {
   switch (action.type) {
