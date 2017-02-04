@@ -48,9 +48,7 @@ class Balls extends React.Component {
         let item = this.props.AppState;
 		let divt = this.dragged;
 		item[index]= {div:div.div,x:event.clientX-25,y:event.clientY-25};
-		//this.setState({data:item});
 		this.props.dispatch(newPosition(item));
-        //console.log(this.props.AppState);
 		this.refs[divt].setAttribute('style', '');
 		
 		//Check for balls which have been hit
@@ -84,19 +82,15 @@ class Balls extends React.Component {
 	if ((hitter_x-fixed_x < 0)&&(hitter_y-fixed_y < 0)) {
 		let addx = this.props.AppState[i].x + 200, addy = this.props.AppState[i].y + 200;	
 		this.roll_it(addx, addy, order, i);	
-		
 	} else if ((hitter_x-fixed_x < 0)&&(hitter_y-fixed_y > 0)) {
 		let addx = this.props.AppState[i].x + 200, addy = this.props.AppState[i].y - 200;
 		this.roll_it(addx, addy, order, i);
-	
 	} else if ((hitter_x-fixed_x > 0)&&(hitter_y-fixed_y > 0)) {
 		let addx = this.props.AppState[i].x - 200, addy = this.props.AppState[i].y - 200;
 		this.roll_it(addx, addy, order, i);
-	
 	} else if ((hitter_x-fixed_x > 0)&&(hitter_y-fixed_y < 0)) {
 		let addx = this.props.AppState[i].x - 200, addy = this.props.AppState[i].y + 200;
 		this.roll_it(addx, addy, order, i);
-	
 	} else {alert('that is a new move. I dont have the code for that yet. Sorry!');}
   }
   
@@ -107,7 +101,6 @@ class Balls extends React.Component {
 	let item = this.props.AppState;
 	item[i] = {div: "div"+i, x: addx, y: addy};
 	this.props.dispatch(newPosition(item));
-	//this.setState({data:item});
 	let BoxLimit_x = 600; addx > BoxLimit_x ? addx = BoxLimit_x : addx;
 	let BoxLimit_y = 600; addy > BoxLimit_y ? addy = BoxLimit_y : addy;
 	let x2 = addx + 'px', y2 = addy + 'px';
