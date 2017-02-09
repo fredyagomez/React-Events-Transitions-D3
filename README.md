@@ -9,6 +9,9 @@ By modifying the SVG components to simple DIV + styling components we can achive
 
 Link to demo: (http://54.201.121.249:3132/Dragging#/)
 
+![alt tag](https://github.com/fredyagomez/React-Events-Transitions-D3/blob/master/ballsreact.gif?raw=true)
+
+
 # Instructions
 
 Development Front End
